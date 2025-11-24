@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.2] - 2025-11-24
+
+### Fixed
+- Refactor Emote and Carrier services to improve entity existence checks and remove unused CleanupService
+
 ## [1.1.1] - 2025-11-12
 
 ### Fixed
