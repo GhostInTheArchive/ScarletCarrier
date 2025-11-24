@@ -56,10 +56,7 @@ public class Plugin : BasePlugin {
   }
 
   public static void OnInitialize() {
-    LogInstance.LogInfo("Removing carrier entities...");
     CarrierService.Initialize();
-    CleanupService.ClearEntitiesInRadius(new float2(0, 0), 15);
-    LogInstance.LogInfo("Carrier entities removed.");
   }
 
   public static void LoadSettings() {

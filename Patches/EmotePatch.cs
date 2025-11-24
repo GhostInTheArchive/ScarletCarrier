@@ -28,24 +28,36 @@ public static class EmoteSystemPatch {
 
     try {
       foreach (var entity in entities) {
-        if (entity.IsNull() || !entity.Exists()) continue;
+        if (!entity.Exists()) continue;
+
         var useEmoteEvent = entity.Read<UseEmoteEvent>();
         var fromCharacter = entity.Read<FromCharacter>();
         var emoteGuid = useEmoteEvent.Action;
-        User user = fromCharacter.User.Read<User>();
-        ulong steamId = user.PlatformId;
+        var user = fromCharacter.User;
+
+        if (!user.Exists()) {
+          continue;
+        }
+
+        var player = user.GetPlayerData();
+
+        if (player == null) {
+          continue;
+        }
+
+        var platformId = player.PlatformId;
 
         if (!EmoteActions.TryGetValue(emoteGuid, out var action)) {
           continue;
         }
 
-        if (Plugin.Database.Get<List<ulong>>("DisabledEmotes")?.Contains(steamId) == true) {
+        if (Plugin.Database.Get<List<ulong>>("DisabledEmotes")?.Contains(platformId) == true) {
           continue;
         }
 
         entity.Destroy(true);
 
-        action(steamId);
+        action(platformId);
       }
     } catch (Exception ex) {
       Log.Error($"Error in EmoteSystemPatch: {ex.Message}");

@@ -73,10 +73,13 @@ internal static class CarrierService {
     }).ToEntityArray(Allocator.Temp);
 
     foreach (var servant in query) {
-      if (servant.IsNull() || !servant.Exists()) continue;
+      if (!servant.Exists()) continue;
       if (!servant.Has<ServantData>() || !servant.Has<NameableInteractable>() || !servant.Has<EntityOwner>()) continue;
-      if (!servant.Has<NameableInteractable>() || servant.Read<NameableInteractable>().Name.Value != Carrier.Id) continue;
+      if (servant.Read<NameableInteractable>().Name.Value != Carrier.Id) continue;
       var owner = servant.Read<EntityOwner>().Owner;
+
+      if (!owner.Exists()) continue;
+
       var player = owner.GetPlayerData();
 
       if (player == null) continue;
@@ -107,10 +110,10 @@ internal static class CarrierService {
     var playerData = platformId.GetPlayerData();
     Carrier carrier;
 
-    if (!Carriers.ContainsKey(playerData.PlatformId)) {
+    if (!Carriers.TryGetValue(playerData.PlatformId, out Carrier value)) {
       carrier = new(playerData);
       carrier.Create();
-    } else carrier = Carriers[playerData.PlatformId];
+    } else carrier = value;
 
     if (carrier == null) {
       Log.Error($"Failed to create carrier for player {playerData.Name} ({playerData.PlatformId}).");
